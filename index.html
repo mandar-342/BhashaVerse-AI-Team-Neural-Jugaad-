@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BhashaVerse — आपका खेती सहायक</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Warm earthy palette — sunflower, soil, sky, leaf */
+  --sun:    #F5A623;   /* golden yellow */
+  --sun2:   #FFC94A;   /* bright yellow */
+  --leaf:   #3DAA5C;   /* fresh green */
+  --leaf2:  #57C97A;   /* light green */
+  --sky:    #2E86DE;   /* clear blue */
+  --sky2:   #74B9FF;   /* light blue */
+  --soil:   #8B4513;   /* brown */
+  --red:    #E74C3C;
+  --cream:  #FFFBF0;   /* warm white */
+  --cream2: #FFF5DC;   /* butter */
+  --stone:  #F0EAD6;   /* warm beige */
+  --mud:    #6B4226;   /* dark brown text */
+  --text:   #2C1810;   /* deep brown */
+  --text2:  #5C3D2E;   /* medium brown */
+  --muted:  #9B7B6A;
+  --border: #E8D5B7;
+  --border2:#DBBF8A;
+  --font:   'Baloo 2', 'Noto Sans Devanagari', sans-serif;
+  --r:      14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--cream);color:var(--text);font-family:var(--font);min-height:100vh;max-width:480px;margin:0 auto;overflow-x:hidden}
+
+/* ── SKY HEADER ── */
+.hdr{background:linear-gradient(135deg,#1565C0 0%,#2E86DE 50%,#42A5F5 100%);padding:0;position:sticky;top:0;z-index:300;box-shadow:0 3px 16px rgba(30,90,180,.3)}
+.hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:11px 16px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:40px;height:40px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.logo-text .title{font-size:17px;font-weight:800;color:#fff;line-height:1.1}
+.logo-text .sub{font-size:10px;color:rgba(255,255,255,.75);font-weight:500;margin-top:1px}
+.net-badge{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 11px;font-size:10.5px;font-weight:600;color:#fff}
+.dot{width:6px;height:6px;border-radius:50%;background:#4CD964;box-shadow:0 0 6px #4CD964;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── FIELD ILLUSTRATION STRIP ── */
+.field-strip{background:linear-gradient(to bottom,#87CEEB 0%,#98D8C8 40%,#5BAE6E 40%,#4A9A5C 60%,#8B6914 60%,#7A5C10 100%);height:52px;position:relative;overflow:hidden}
+.field-strip::before{content:'🌾🌾🌿🌾🌾🌿🌾🌾🌿🌾🌾';position:absolute;bottom:20px;left:0;right:0;font-size:18px;letter-spacing:2px;text-align:center;line-height:1}
+.field-strip::after{content:'☁️';position:absolute;top:4px;left:18%;font-size:14px;opacity:.7}
+
+/* ── NAV BAR ── */
+.nav{display:flex;background:#fff;border-bottom:2px solid var(--stone);position:sticky;top:62px;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ntab{flex:1;min-width:0;padding:9px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:var(--font);font-size:9px;font-weight:600;border-bottom:3px solid transparent;transition:all .18s;line-height:1.2}
+.ntab.on{color:var(--leaf);border-bottom-color:var(--leaf)}
+.ntab-icon{font-size:18px;line-height:1}
+
+/* ── SCREENS ── */
+.scr{display:none;padding:0 0 100px;background:var(--cream)}
+.scr.on{display:block;animation:fadein .22s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.pad{padding:14px}
+
+/* ── CARDS ── */
+.card{background:#fff;border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.card-pad{padding:14px}
+
+/* ── SECTION HEADERS ── */
+.sec-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}
+
+/* ── CHIPS ── */
+.chips{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:3px;margin-bottom:14px}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:6px 14px;border-radius:20px;white-space:nowrap;border:1.5px solid var(--border2);background:var(--stone);color:var(--text2);font-size:12.5px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all .15s;flex-shrink:0}
+.chip.on{background:var(--leaf);border-color:var(--leaf);color:#fff}
+
+/* ── BUTTONS ── */
+.btn{padding:13px 18px;border-radius:12px;border:none;font-family:var(--font);font-size:14.5px;font-weight:700;cursor:pointer;transition:all .17s;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.01em}
+.btn-primary{background:linear-gradient(135deg,var(--leaf),var(--leaf2));color:#fff;box-shadow:0 4px 14px rgba(61,170,92,.3)}
+.btn-primary:active{transform:scale(.97)}
+.btn-sec{background:var(--stone);border:1.5px solid var(--border2);color:var(--text)}
+.btn-sun{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;box-shadow:0 4px 12px rgba(245,166,35,.3)}
+.btn-sky{background:linear-gradient(135deg,var(--sky),var(--sky2));color:#fff;box-shadow:0 4px 12px rgba(46,134,222,.3)}
+.btn-block{width:100%}
+
+/* ── INFO BANNER ── */
+.banner{display:flex;gap:10px;align-items:flex-start;background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border:1.5px solid #A5D6A7;border-radius:12px;padding:11px 13px;font-size:12.5px;color:#2E7D32;line-height:1.65;margin-bottom:14px;font-weight:500}
+.banner-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+
+/* ══════════════════════
+   VOICE SCREEN
+══════════════════════ */
+.chat-area{background:var(--stone);min-height:260px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:14px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.msg-wrap{display:flex;gap:8px;align-items:flex-end;animation:msgIn .25s ease}
+.msg-wrap.me{flex-direction:row-reverse}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.av{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px}
+.av-ai{background:linear-gradient(135deg,var(--leaf),var(--leaf2));box-shadow:0 2px 8px rgba(61,170,92,.3)}
+.av-me{background:linear-gradient(135deg,var(--sky),var(--sky2))}
+.bubble{max-width:82%;padding:10px 14px;border-radius:16px;font-size:13.5px;line-height:1.7;font-weight:500}
+.bubble.ai{background:#fff;color:var(--text);border-bottom-left-radius:4px;box-shadow:0 1px 5px rgba(0,0,0,.08);border:1px solid var(--border)}
+.bubble.me{background:linear-gradient(135deg,var(--sky),#4A9FD4);color:#fff;border-bottom-right-radius:4px}
+.bubble-src{font-size:10px;color:var(--leaf);margin-top:5px;font-weight:600;display:flex;align-items:center;gap:3px}
+.typing-ind{display:flex;align-items:center;gap:4px;padding:11px 14px;background:#fff;border-radius:16px;border-bottom-left-radius:4px;width:fit-content;box-shadow:0 1px 5px rgba(0,0,0,.08)}
+.td{width:7px;height:7px;border-radius:50%;background:var(--border2);animation:bounce 1.2s infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* MIC AREA */
+.mic-area{padding:16px 14px 12px;background:#fff;border-top:2px solid var(--stone)}
+.mic-center{display:flex;flex-direction:column;align-items:center;gap:0;margin-bottom:12px}
+.mic-rings{position:relative;width:80px;height:80px;margin-bottom:8px}
+.ring{position:absolute;inset:0;border-radius:50%;background:var(--leaf2);opacity:0}
+.ring.r1.go{animation:grow 1.6s ease-out infinite}
+.ring.r2.go{animation:grow 1.6s .6s ease-out infinite}
+@keyframes grow{0%{opacity:.35;transform:scale(1)}100%{opacity:0;transform:scale(2.4)}}
+.mic-btn{position:relative;z-index:2;width:80px;height:80px;border-radius:50%;background:linear-gradient(145deg,var(--leaf),#2D8B47);border:none;font-size:30px;cursor:pointer;box-shadow:0 6px 20px rgba(61,170,92,.4),inset 0 1px 0 rgba(255,255,255,.2);transition:all .18s;display:flex;align-items:center;justify-content:center}
+.mic-btn.on{background:linear-gradient(145deg,#E74C3C,#C0392B);box-shadow:0 6px 20px rgba(231,76,60,.5)}
+.mic-btn:active{transform:scale(.94)}
+.mic-label{font-size:12px;font-weight:700;color:var(--muted)}
+.quick-q{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.quick-q::-webkit-scrollbar{display:none}
+.qq{padding:7px 13px;border-radius:18px;white-space:nowrap;background:var(--cream2);border:1.5px solid var(--border2);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;font-family:var(--font);transition:all .15s}
+.qq:hover,.qq:active{background:var(--sun2);border-color:var(--sun);color:var(--text)}
+
+/* ══════════════════════
+   CROP SCREEN
+══════════════════════ */
+.upload-zone{border:2.5px dashed var(--border2);border-radius:var(--r);height:188px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;margin-bottom:14px;background:var(--cream2)}
+.upload-zone:hover{border-color:var(--leaf);background:rgba(87,201,122,.06)}
+.upload-zone img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:11px}
+.upload-zone .scanning{position:absolute;inset:0;background:rgba(255,251,240,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:4}
+.scan-bar{width:60%;height:3px;background:var(--stone);border-radius:3px;overflow:hidden;margin-top:4px}
+.scan-fill{height:100%;background:linear-gradient(90deg,var(--leaf),var(--sun2));border-radius:3px;animation:fill 2.2s ease forwards}
+@keyframes fill{from{width:0}to{width:100%}}
+
+/* RESULT */
+.result-card{display:none;background:#fff;border-radius:var(--r);border:1.5px solid var(--border);overflow:hidden;margin-bottom:12px}
+.result-card.show{display:block;animation:fadein .3s ease}
+.result-top{padding:14px 14px 10px;display:flex;justify-content:space-between;align-items:flex-start}
+.result-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:2px}
+.result-sub{font-size:10px;color:var(--muted);font-weight:600}
+.badge{padding:4px 10px;border-radius:8px;font-size:10px;font-weight:800;letter-spacing:.04em}
+.badge-danger{background:#FFEBEE;color:#C62828;border:1.5px solid #EF9A9A}
+.badge-warn{background:#FFF3E0;color:#E65100;border:1.5px solid #FFCC80}
+.badge-ok{background:#E8F5E9;color:#1B5E20;border:1.5px solid #A5D6A7}
+.res-section{padding:10px 14px;border-top:1px solid var(--stone)}
+.res-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.res-val{font-size:13px;color:var(--text2);line-height:1.7;font-weight:500}
+.speak-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 14px;background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border-top:1px solid #A5D6A7;cursor:pointer;font-size:13px;font-weight:700;color:var(--leaf)}
+.speak-row:active{opacity:.8}
+.crop-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:4px}
+.ctag{padding:5px 12px;border-radius:10px;font-size:12px;font-weight:600;background:var(--stone);border:1px solid var(--border2);color:var(--text2)}
+
+/* ══════════════════════
+   SCHEMES SCREEN
+══════════════════════ */
+.search-box{display:flex;align-items:center;gap:9px;background:#fff;border:1.5px solid var(--border2);border-radius:13px;padding:10px 14px;margin-bottom:12px;box-shadow:0 1px 5px rgba(0,0,0,.05)}
+.search-box input{flex:1;background:none;border:none;color:var(--text);font-size:14px;font-family:var(--font);font-weight:500}
+.search-box input:focus{outline:none}
+.search-box input::placeholder{color:var(--muted);font-weight:400}
+.scheme-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.scheme-top{padding:13px 14px;display:flex;align-items:center;gap:11px;cursor:pointer}
+.sch-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.sch-info{flex:1;min-width:0}
+.sch-name{font-size:14px;font-weight:800;color:var(--text)}
+.sch-benefit{font-size:12px;color:var(--leaf);font-weight:600;margin-top:2px}
+.sch-chevron{font-size:16px;color:var(--muted);transition:transform .2s;flex-shrink:0}
+.sch-chevron.open{transform:rotate(90deg)}
+.scheme-body{display:none;padding:12px 14px;border-top:1.5px solid var(--stone);background:var(--cream)}
+.scheme-body.open{display:block;animation:fadein .2s ease}
+.info-row{margin-bottom:10px}
+.info-label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.info-val{font-size:13px;color:var(--text2);line-height:1.7;font-weight:500}
+.helpline-box{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--sun),var(--sun2));border-radius:11px;padding:10px 13px;margin-top:10px}
+.helpline-box .hl-num{font-size:20px;font-weight:900;color:#fff;font-family:var(--font)}
+.helpline-box .hl-lbl{font-size:10px;color:rgba(255,255,255,.8);font-weight:600}
+.sch-speak{display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;background:var(--stone);border-radius:10px;margin-top:9px;cursor:pointer;font-size:13px;font-weight:700;color:var(--leaf)}
+
+/* ══════════════════════
+   MARKET SCREEN
+══════════════════════ */
+.mandi-hdr{padding:12px 14px;background:linear-gradient(135deg,#1B5E20,#2E7D32);display:flex;justify-content:space-between;align-items:center}
+.mandi-name{font-size:13.5px;font-weight:800;color:#fff}
+.mandi-time{font-size:10px;color:rgba(255,255,255,.7);font-weight:600}
+.live-dot{font-size:9px;color:#A5D6A7;font-weight:800}
+.price-row{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--stone);gap:10px;transition:background .15s}
+.price-row:last-child{border-bottom:none}
+.price-row:active{background:var(--stone)}
+.crop-ico{font-size:24px;flex-shrink:0}
+.crop-detail{flex:1}
+.crop-name{font-size:13.5px;font-weight:700;color:var(--text)}
+.crop-hi{font-size:11px;color:var(--muted);font-weight:500}
+.price-right{text-align:right}
+.price-val{font-size:16px;font-weight:900;color:var(--text);font-family:var(--font)}
+.price-chg{font-size:11px;font-weight:700;margin-top:2px}
+.up{color:var(--leaf)}.dn{color:var(--red)}
+.msp-section{background:#fff;border-radius:var(--r);border:1.5px solid var(--border);overflow:hidden;margin-bottom:12px}
+.msp-hdr{padding:11px 14px;background:linear-gradient(135deg,#E65100,#FF8F00);display:flex;align-items:center;gap:8px}
+.msp-title{font-size:13px;font-weight:800;color:#fff}
+.msp-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--stone)}
+.msp-row:last-child{border-bottom:none}
+.msp-crop{font-size:13px;font-weight:600;color:var(--text)}
+.msp-price{font-size:13.5px;font-weight:900;color:var(--sun);font-family:var(--font)}
+
+/* ══════════════════════
+   COMMUNITY SCREEN
+══════════════════════ */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat-box{background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;box-shadow:0 1px 5px rgba(0,0,0,.04)}
+.stat-num{font-size:24px;font-weight:900;color:var(--leaf)}
+.stat-lbl{font-size:10.5px;color:var(--muted);font-weight:600;margin-top:1px}
+.compose-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.compose-title{font-size:13.5px;font-weight:800;margin-bottom:10px;color:var(--text)}
+.compose-ta{width:100%;background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-size:13.5px;font-family:var(--font);resize:none;min-height:75px;line-height:1.65;font-weight:500;margin-bottom:10px}
+.compose-ta:focus{outline:none;border-color:var(--leaf)}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}
+.tag-opt{padding:5px 12px;border-radius:18px;border:1.5px solid var(--border2);background:var(--stone);color:var(--text2);font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s}
+.tag-opt.on{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.post-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;box-shadow:0 1px 5px rgba(0,0,0,.04)}
+.post-top{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.post-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0}
+.post-name{font-size:13px;font-weight:800;color:var(--text)}
+.post-meta{font-size:11px;color:var(--muted);font-weight:500;margin-top:1px}
+.post-tag{margin-left:auto;font-size:9.5px;font-weight:800;padding:3px 9px;border-radius:7px;white-space:nowrap}
+.post-txt{font-size:13.5px;line-height:1.75;color:var(--text2);margin-bottom:10px;font-weight:500}
+.post-actions{display:flex;gap:16px;border-top:1px solid var(--stone);padding-top:10px}
+.pact{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;background:none;border:none;font-family:var(--font);transition:color .15s}
+.pact:hover{color:var(--leaf)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:var(--mud);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;white-space:nowrap;opacity:0;transition:opacity .22s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.toast.vis{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="logo">
+      <div class="logo-icon">🌿</div>
+      <div class="logo-text">
+        <div class="title">BhashaVerse AI</div>
+        <div class="sub">आपका डिजिटल खेती सहायक</div>
+      </div>
+    </div>
+    <div class="net-badge" id="netBadge">
+      <div class="dot" id="netDot"></div>
+      <span id="netTxt">Online</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ FIELD STRIP ══ -->
+<div class="field-strip"></div>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <button class="ntab on" onclick="goTab('voice',this)">
+    <span class="ntab-icon">🎤</span>बोलें
+  </button>
+  <button class="ntab" onclick="goTab('crop',this)">
+    <span class="ntab-icon">🌾</span>फसल
+  </button>
+  <button class="ntab" onclick="goTab('schemes',this)">
+    <span class="ntab-icon">📋</span>योजनाएं
+  </button>
+  <button class="ntab" onclick="goTab('market',this)">
+    <span class="ntab-icon">💰</span>भाव
+  </button>
+  <button class="ntab" onclick="goTab('community',this)">
+    <span class="ntab-icon">👥</span>समुदाय
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════
+     SCREEN 1 — VOICE / बोलें
+════════════════════════════════ -->
+<div class="scr on" id="scr-voice">
+
+  <!-- Language chips -->
+  <div style="padding:12px 14px 0">
+    <div class="sec-label">भाषा चुनें / Choose Language</div>
+    <div class="chips" id="langBar">
+      <div class="chip on" onclick="setLang('hi',this)">🇮🇳 हिंदी</div>
+      <div class="chip" onclick="setLang('mr',this)">🟠 मराठी</div>
+      <div class="chip" onclick="setLang('ta',this)">🔵 தமிழ்</div>
+      <div class="chip" onclick="setLang('te',this)">🟢 తెలుగు</div>
+      <div class="chip" onclick="setLang('bn',this)">🟡 বাংলা</div>
+      <div class="chip" onclick="setLang('en',this)">🌐 English</div>
+    </div>
+  </div>
+
+  <!-- Chat window -->
+  <div class="chat-area" id="chatWin">
+    <div class="msg-wrap">
+      <div class="av av-ai">🌿</div>
+      <div class="bubble ai">नमस्ते किसान भाई! 🙏<br>मैं आपका AI सहायक हूँ। खेती, बीमारी, सरकारी योजना — कुछ भी पूछें।
+        <div class="bubble-src">📵 बिना internet के भी काम करता है</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mic + Controls -->
+  <div class="mic-area">
+    <div class="mic-center">
+      <div class="mic-rings">
+        <div class="ring r1" id="ring1"></div>
+        <div class="ring r2" id="ring2"></div>
+        <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
+      </div>
+      <div class="mic-label" id="micLabel">बोलने के लिए दबाएं</div>
+    </div>
+    <div class="quick-q">
+      <div class="qq" onclick="ask('गेहूं में जंग रोग का उपाय बताएं')">🌾 गेहूं रोग</div>
+      <div class="qq" onclick="ask('PM किसान योजना में पैसे कब आएंगे?')">💰 PM किसान</div>
+      <div class="qq" onclick="ask('फसल में कौन सी खाद डालें?')">🌱 खाद</div>
+      <div class="qq" onclick="ask('मौसम की जानकारी कहाँ से मिलेगी?')">🌤 मौसम</div>
+      <div class="qq" onclick="ask('Ayushman Bharat card kaise banaye')">🏥 Ayushman</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SCREEN 2 — CROP / फसल
+════════════════════════════════ -->
+<div class="scr" id="scr-crop">
+  <div class="pad">
+    <div class="banner">
+      <div class="banner-icon">📵</div>
+      <div>पत्ती की <strong>फोटो लें</strong> → AI तुरंत रोग पहचानेगा · <strong>बिना internet</strong> के भी काम करता है</div>
+    </div>
+
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('leafInput').click()">
+      <div class="scanning" id="scanOverlay" style="display:none">
+        <div style="font-size:38px">🔬</div>
+        <div style="font-size:14px;font-weight:800;color:var(--leaf)">AI जाँच रहा है...</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600">TFLite मॉडल · Offline</div>
+        <div class="scan-bar"><div class="scan-fill" id="scanFill"></div></div>
+      </div>
+      <div id="uploadPrompt" style="display:flex;flex-direction:column;align-items:center;gap:7px">
+        <div style="font-size:52px">🍃</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text2);text-align:center">पत्ती की फोटो यहाँ लगाएं<br><span style="font-size:11.5px;color:var(--muted);font-weight:500">Tap to take leaf photo</span></div>
+      </div>
+    </div>
+    <input type="file" id="leafInput" accept="image/*" capture="environment" style="display:none" onchange="handleLeaf(this)">
+
+    <div style="display:flex;gap:10px;margin-bottom:14px">
+      <button class="btn btn-primary" style="flex:1" onclick="document.getElementById('leafInput').click()">📷 Camera से लें</button>
+      <button class="btn btn-sun" style="flex:1" onclick="runDemo()">🔬 Demo देखें</button>
+    </div>
+
+    <!-- Result -->
+    <div class="result-card" id="resultCard">
+      <div class="result-top">
+        <div>
+          <div class="result-name" id="rName">—</div>
+          <div class="result-sub">TFLite MobileNetV2 · Offline Detection</div>
+        </div>
+        <div class="badge" id="rBadge">—</div>
+      </div>
+      <div class="res-section">
+        <div class="res-label">🔍 लक्षण / Symptoms</div>
+        <div class="res-val" id="rSym"></div>
+      </div>
+      <div class="res-section">
+        <div class="res-label">💊 उपचार / Treatment</div>
+        <div class="res-val" id="rTreat" style="color:#1B5E20;font-weight:600"></div>
+      </div>
+      <div class="res-section">
+        <div class="res-label">🛡️ बचाव / Prevention</div>
+        <div class="res-val" id="rPrev"></div>
+      </div>
+      <div class="speak-row" onclick="speakResult()">
+        🔊 हिंदी में सुनें · Listen in Hindi
+      </div>
+    </div>
+
+    <div class="sec-label">समर्थित फसलें / Supported Crops</div>
+    <div class="crop-tags">
+      <span class="ctag">🌾 गेहूं</span><span class="ctag">🌽 मक्का</span>
+      <span class="ctag">🍚 धान</span><span class="ctag">🥜 सोयाबीन</span>
+      <span class="ctag">🍅 टमाटर</span><span class="ctag">🫑 कपास</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SCREEN 3 — SCHEMES / योजनाएं
+════════════════════════════════ -->
+<div class="scr" id="scr-schemes">
+  <div class="pad">
+    <div class="search-box">
+      <span style="font-size:17px">🔍</span>
+      <input type="text" placeholder="योजना खोजें... (जैसे: किसान, बीमा, स्वास्थ्य)" id="schSearch" oninput="renderSchemes()">
+    </div>
+    <div class="chips" id="catChips">
+      <div class="chip on" onclick="setCat('all',this)">📋 सभी</div>
+      <div class="chip" onclick="setCat('agriculture',this)">🌾 खेती</div>
+      <div class="chip" onclick="setCat('health',this)">🏥 स्वास्थ्य</div>
+      <div class="chip" onclick="setCat('finance',this)">💰 वित्त</div>
+    </div>
+    <div id="schList"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SCREEN 4 — MARKET / भाव
+════════════════════════════════ -->
+<div class="scr" id="scr-market">
+  <div class="pad">
+    <div class="banner">
+      <div class="banner-icon">⚠️</div>
+      <div>MSP से <strong>कम दाम पर कभी न बेचें!</strong> नीचे आज के मंडी भाव और सरकारी MSP देखें।</div>
+    </div>
+
+    <!-- Mandi 1 -->
+    <div class="card" style="border:none;overflow:hidden">
+      <div class="mandi-hdr">
+        <div>
+          <div class="mandi-name">📍 नाशिक मंडी, महाराष्ट्र</div>
+          <div class="mandi-time">आज सुबह 6:30 बजे · Agmarknet</div>
+        </div>
+        <div class="live-dot">● LIVE</div>
+      </div>
+      <div id="priceList1"></div>
+    </div>
+
+    <!-- Mandi 2 -->
+    <div class="card" style="border:none;overflow:hidden">
+      <div class="mandi-hdr">
+        <div>
+          <div class="mandi-name">📍 इंदौर मंडी, मध्य प्रदेश</div>
+          <div class="mandi-time">आज सुबह 7:15 बजे · Agmarknet</div>
+        </div>
+        <div class="live-dot">● LIVE</div>
+      </div>
+      <div id="priceList2"></div>
+    </div>
+
+    <!-- MSP -->
+    <div class="msp-section">
+      <div class="msp-hdr">
+        <span style="font-size:18px">🏛️</span>
+        <div class="msp-title">MSP 2025-26 · न्यूनतम समर्थन मूल्य</div>
+      </div>
+      <div id="mspList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SCREEN 5 — COMMUNITY / समुदाय
+════════════════════════════════ -->
+<div class="scr" id="scr-community">
+  <div class="pad">
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num" id="postCount">5</div><div class="stat-lbl">Posts</div></div>
+      <div class="stat-box"><div class="stat-num">247</div><div class="stat-lbl">किसान</div></div>
+      <div class="stat-box"><div class="stat-num">12</div><div class="stat-lbl">भाषाएं</div></div>
+    </div>
+
+    <div class="compose-card">
+      <div class="compose-title">✍️ अपना सवाल पूछें · अपना अनुभव साझा करें</div>
+      <textarea class="compose-ta" id="composeTxt" placeholder="खेती, योजना, स्वास्थ्य — कुछ भी लिखें..."></textarea>
+      <div class="tag-row" id="tagRow">
+        <div class="tag-opt on" onclick="pickTag(this,'फसल मदद')">🌾 फसल मदद</div>
+        <div class="tag-opt" onclick="pickTag(this,'योजनाएं')">📋 योजनाएं</div>
+        <div class="tag-opt" onclick="pickTag(this,'स्वास्थ्य')">🏥 स्वास्थ्य</div>
+        <div class="tag-opt" onclick="pickTag(this,'संसाधन')">🤝 संसाधन</div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="submitPost()">📤 Post करें</button>
+    </div>
+
+    <div id="postFeed"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ───── CONFIG ───── */
+const API_URL = 'https://kux4swtqd6.execute-api.ap-south-1.amazonaws.com/default/bhashaverse-query'; // Replace with your API Gateway URL
+
+/* ───── STATE ───── */
+let lang = 'hi', cat = 'all', selTag = 'फसल मदद';
+let isListening = false, recognition = null, lastDisease = null;
+
+/* ───── OFFLINE KB ───── */
+const KB = {
+  'गेहूं':     '🌾 गेहूं के मुख्य रोग:\n• जंग (Rust) — प्रोपिकोनाज़ोल 1ml/लीटर पानी में छिड़काव\n• करनाल बन्ट — बुवाई से पहले Carbendazim से बीज उपचार\n• चूर्णिल फफूंदी — Sulphur 80% WP 2g/लीटर\n📞 Kisan Helpline: 1551 (24 घंटे, मुफ्त)',
+  'wheat':     '🌾 Wheat diseases:\n• Rust: Propiconazole 1ml/liter spray\n• Karnal Bunt: Carbendazim seed treatment\n• Powdery Mildew: Sulphur 80% WP\n📞 Kisan Helpline: 1551 (24/7 free)',
+  'जंग':       '🔴 जंग रोग (Rust):\nपत्तियों पर लाल-भूरे धब्बे। Propiconazole 25% EC (1ml/लीटर) का तुरंत छिड़काव करें। 15 दिन बाद दोहराएं। जल्दी करने से 90% नुकसान बचेगा।',
+  'रोग':       '🔬 रोग पहचान के लिए "फसल" tab पर जाएं → पत्ती की फोटो लें → AI offline रोग पहचानेगा। सामान्य उपाय: नीम तेल 5ml/लीटर पानी में।',
+  'खाद':       '🌱 उर्वरक सिफारिश:\n• DAP: बुवाई के समय 50 kg/एकड़\n• Urea: Top Dressing 25-30 kg/एकड़\n• Zinc Sulphate: 8-10 kg/एकड़ (कमी हो तो)\n💡 मिट्टी परीक्षण KVK में मुफ्त होता है!',
+  'fertilizer':'🌱 Fertilizer tips:\nDAP 50kg/acre at sowing, Urea 25-30kg/acre top dressing. Free soil testing at KVK.',
+  'मौसम':      '🌤 मौसम जानकारी:\n📞 Kisan Helpline: 1551 (24 घंटे, 22 भाषाएं, मुफ्त)\n📞 IMD Agrimet: 1800-180-1717\n🌐 agromet.imd.gov.in\n💡 बुवाई से पहले 5 दिन का पूर्वानुमान जरूर देखें',
+  'किसान':     '💰 PM-KISAN योजना:\n• ₹6,000/वर्ष — 3 किस्तों में (₹2,000×3)\n• सीधे बैंक खाते में\n• Apply: pmkisan.gov.in\n📞 Helpline: 155261',
+  'kisan':     '💰 PM-KISAN: ₹6,000/year in 3 installments directly to bank. Apply: pmkisan.gov.in. Helpline: 155261.',
+  'बीमा':      '🛡️ PM Fasal Bima:\n• प्राकृतिक आपदा से फसल सुरक्षा\n• बहुत कम प्रीमियम (Rabi: 1.5%, Kharif: 2%)\n• बुवाई से पहले आवेदन करें\n📞 Helpline: 14447',
+  'ayushman':  '🏥 Ayushman Bharat PM-JAY:\n• ₹5 लाख/परिवार/वर्ष मुफ्त इलाज\n• पात्रता जांचें: pmjay.gov.in\n📞 Helpline: 14555',
+  'health':    '🏥 Health services:\nAyushman Bharat - ₹5 lakh free treatment. Helpline 14555. Emergency: 108.',
+  'सिंचाई':   '💧 गेहूं सिंचाई समय:\n1. CRI (बुवाई के 20 दिन बाद)\n2. Tillering (40 दिन)\n3. Jointing (60 दिन)\n4. Booting (80 दिन)\n💡 Drip irrigation से 40-50% पानी बचाएं',
+  'market':    '📊 मंडी भाव: agmarknet.gov.in पर सभी मंडियों के भाव देखें। eNAM Portal पर ऑनलाइन बेचें।',
+  'भाव':       '📊 फसल भाव:\n• agmarknet.gov.in — सभी मंडियां\n• eNAM Portal — ऑनलाइन बिक्री\n⚠️ MSP से कम पर कभी न बेचें!',
+};
+
+function getKB(q) {
+  const ql = q.toLowerCase();
+  for (const [k,v] of Object.entries(KB)) {
+    if (ql.includes(k.toLowerCase())) return v;
+  }
+  return lang === 'en'
+    ? '🌿 BhashaVerse AI works offline! Ask about crops, health, or govt schemes.\n📞 Kisan Helpline: 1551 (24x7, free, 22 languages)'
+    : '🌿 खेती, स्वास्थ्य या सरकारी योजनाओं के बारे में पूछें!\n📞 Kisan Helpline: 1551 (24 घंटे, मुफ्त, 22 भाषाएं)';
+}
+
+/* ───── DISEASE DB ───── */
+const DISEASES = {
+  rust: {
+    name: 'गेहूं जंग रोग — Wheat Rust', sev: 'danger',
+    sym: 'पत्तियों और तनों पर लाल-भूरे उभरे हुए धब्बे · पत्तियां पीली पड़ने लगती हैं · Reddish-brown raised pustules on leaves',
+    treat: 'Propiconazole 25% EC — 1ml प्रति लीटर पानी में मिलाकर तुरंत छिड़काव करें। 15 दिन बाद दोहराएं। जल्दी इलाज से 90% नुकसान बचाएं।',
+    prev: 'Resistant varieties जैसे HD-2967, HD-3086 लगाएं · देर से बुवाई से बचें · हर 7 दिन में फसल की जाँच करें',
+    speak: 'आपकी फसल में गेहूं जंग रोग पाया गया है। यह एक गंभीर रोग है। प्रोपिकोनाज़ोल एक मिलीलीटर प्रति लीटर पानी में मिलाकर तुरंत छिड़काव करें।',
+  },
+  blight: {
+    name: 'पत्ती झुलसा रोग — Leaf Blight', sev: 'warn',
+    sym: 'पत्तियों के किनारे पीले-भूरे होना · पत्तियां ऊपर से जलने जैसी दिखती हैं · Yellow-brown leaf edge necrosis',
+    treat: 'Carbendazim 50% WP — 1g प्रति लीटर पानी में छिड़काव करें। खेत में पानी जमा न होने दें। संक्रमित पत्तियां तुरंत हटाएं।',
+    prev: 'पौधों के बीच उचित दूरी रखें · ऊपर से सिंचाई न करें · संक्रमित पत्तियां जल्दी हटाएं',
+    speak: 'आपकी फसल में पत्ती झुलसा रोग मिला है। कार्बेंडाजिम एक ग्राम प्रति लीटर पानी में मिलाकर छिड़काव करें।',
+  },
+  healthy: {
+    name: 'फसल स्वस्थ है ✅ — Healthy Crop', sev: 'ok',
+    sym: 'कोई रोग नहीं मिला · फसल की पत्तियां हरी और स्वस्थ दिख रही हैं · No disease detected',
+    treat: 'नियमित देखभाल जारी रखें · समय पर खाद और पानी दें · फसल की तरक्की अच्छी है!',
+    prev: 'हर 7-10 दिन में फसल की जाँच करें · जल्दी पहचान से 80% नुकसान बचाया जा सकता है',
+    speak: 'बधाई हो! आपकी फसल पूरी तरह स्वस्थ है। नियमित देखभाल जारी रखें और हर सात से दस दिन में जाँच करते रहें।',
+  },
+};
+
+/* ───── SCHEMES DB ───── */
+const SCHEMES = [
+  { id:1, name:'PM-KISAN', hi:'प्रधानमंत्री किसान सम्मान निधि', cat:'agriculture', icon:'🌾', color:'#2E7D32', bg:'#E8F5E9',
+    benefit:'₹6,000 प्रति वर्ष — 3 किस्तों में सीधे बैंक में',
+    elig:'सभी छोटे-सीमांत किसान जिनके पास खेती योग्य भूमि है',
+    docs:'Aadhaar Card + Bank Account + Land Records (खसरा/खतौनी)',
+    apply:'pmkisan.gov.in पर Online या नजदीकी CSC Centre जाएं',
+    helpline:'155261',
+    speak:'पीएम किसान योजना में हर साल छः हजार रुपए मिलते हैं। pmkisan.gov.in पर आवेदन करें।' },
+  { id:2, name:'PM Fasal Bima', hi:'प्रधानमंत्री फसल बीमा योजना', cat:'agriculture', icon:'🛡️', color:'#1565C0', bg:'#E3F2FD',
+    benefit:'बाढ़, सूखा, ओलावृष्टि से पूरी फसल बीमा सुरक्षा',
+    elig:'सभी किसान — अधिसूचित क्षेत्रों में अधिसूचित फसलें',
+    docs:'Aadhaar + Bank Account + Land Records + बुवाई प्रमाण',
+    apply:'कटऑफ तारीख से पहले नजदीकी बैंक या बीमा कंपनी जाएं',
+    helpline:'14447',
+    speak:'पीएम फसल बीमा योजना में प्राकृतिक आपदा से फसल की सुरक्षा होती है। हेल्पलाइन चौदह चार चार सात।' },
+  { id:3, name:'Kisan Credit Card', hi:'किसान क्रेडिट कार्ड', cat:'finance', icon:'💳', color:'#6A1B9A', bg:'#F3E5F5',
+    benefit:'₹3 लाख तक ऋण — केवल 4% ब्याज पर (सरकारी अनुदान के बाद)',
+    elig:'सभी किसान, बटाईदार और SHG',
+    docs:'Aadhaar + PAN + Land Records + 2 Photos',
+    apply:'किसी भी राष्ट्रीयकृत बैंक या ग्रामीण बैंक में जाएं',
+    helpline:'1800-180-1111',
+    speak:'किसान क्रेडिट कार्ड पर तीन लाख रुपए तक केवल चार प्रतिशत ब्याज पर मिलते हैं।' },
+  { id:4, name:'Ayushman Bharat', hi:'आयुष्मान भारत PM-JAY', cat:'health', icon:'🏥', color:'#B71C1C', bg:'#FFEBEE',
+    benefit:'परिवार को ₹5 लाख तक मुफ्त अस्पताल इलाज — प्रति वर्ष',
+    elig:'SECC-2011 डेटा के BPL परिवार · pmjay.gov.in पर पात्रता जांचें',
+    docs:'Aadhaar Card + Ration Card',
+    apply:'pmjay.gov.in पर पात्रता जांचें → किसी सूचीबद्ध अस्पताल जाएं',
+    helpline:'14555',
+    speak:'आयुष्मान भारत में हर परिवार को पांच लाख रुपए तक मुफ्त इलाज मिलता है। हेल्पलाइन एक चार पांच पांच पांच।' },
+  { id:5, name:'PM Ujjwala', hi:'प्रधानमंत्री उज्ज्वला योजना', cat:'welfare', icon:'🔥', color:'#E64A19', bg:'#FBE9E7',
+    benefit:'BPL महिलाओं को मुफ्त LPG कनेक्शन + पहला सिलेंडर',
+    elig:'18+ वर्ष BPL महिलाएं (SC/ST/OBC/Forest Dwellers)',
+    docs:'BPL Ration Card + Aadhaar + Bank Account',
+    apply:'नजदीकी LPG वितरक जाएं या pmuy.gov.in पर apply करें',
+    helpline:'1906',
+    speak:'उज्ज्वला योजना में बीपीएल परिवार की महिलाओं को मुफ्त गैस कनेक्शन मिलता है।' },
+  { id:6, name:'Jan Dhan Yojana', hi:'प्रधानमंत्री जन धन योजना', cat:'finance', icon:'🏦', color:'#E65100', bg:'#FFF3E0',
+    benefit:'Zero Balance खाता + ₹10,000 Overdraft + ₹2 लाख दुर्घटना बीमा',
+    elig:'10+ वर्ष का कोई भी भारतीय नागरिक जिसका बैंक खाता नहीं',
+    docs:'Aadhaar / Voter ID / Driving License',
+    apply:'KYC दस्तावेजों के साथ किसी भी बैंक शाखा जाएं',
+    helpline:'1800-11-0001',
+    speak:'जन धन योजना में जीरो बैलेंस खाता, RuPay कार्ड और दुर्घटना बीमा मिलता है।' },
+];
+
+/* ───── MARKET DATA ───── */
+const MANDI1 = [
+  {ico:'🌾',n:'Wheat',h:'गेहूं',     p:2240,c:+60,up:true},
+  {ico:'🌽',n:'Maize',h:'मक्का',    p:1780,c:-30,up:false},
+  {ico:'🧅',n:'Onion',h:'प्याज',    p:980,c:+120,up:true},
+  {ico:'🌱',n:'Soybean',h:'सोयाबीन',p:4450,c:+85,up:true},
+  {ico:'🍅',n:'Tomato',h:'टमाटर',   p:1560,c:-40,up:false},
+];
+const MANDI2 = [
+  {ico:'🌾',n:'Wheat',h:'गेहूं',     p:2210,c:+40,up:true},
+  {ico:'🌱',n:'Soybean',h:'सोयाबीन',p:4380,c:+60,up:true},
+  {ico:'🌽',n:'Maize',h:'मक्का',    p:1750,c:-20,up:false},
+];
+const MSP_DATA = [
+  {ico:'🌾',n:'Wheat / गेहूं',       p:'₹2,275/qtl'},
+  {ico:'🍚',n:'Paddy / धान',         p:'₹2,300/qtl'},
+  {ico:'🌽',n:'Maize / मक्का',       p:'₹2,090/qtl'},
+  {ico:'🌱',n:'Soybean / सोयाबीन',   p:'₹4,892/qtl'},
+  {ico:'🥜',n:'Groundnut / मूंगफली', p:'₹6,783/qtl'},
+];
+
+/* ───── COMMUNITY POSTS ───── */
+let posts = [
+  {id:1,name:'रमेश कुमार',city:'नागपुर, MH',txt:'मेरे गेहूं की फसल में पीली पत्तियां आ रही हैं — कोई उपाय बताएं?',tag:'फसल मदद',color:'#2E7D32',likes:12,time:'2 घंटे पहले'},
+  {id:2,name:'सुनीता देवी',city:'पटना, BR',txt:'PM Kisan का पैसा कब आएगा? मेरे खाते में अभी तक नहीं आया।',tag:'योजनाएं',color:'#1565C0',likes:8,time:'5 घंटे पहले'},
+  {id:3,name:'Krishnaswamy',city:'Coimbatore, TN',txt:'நெல் பயிரில் பழுப்பு புள்ளி நோய் வந்துள்ளது. என்ன செய்வது?',tag:'फसल मदद',color:'#2E7D32',likes:15,time:'1 दिन पहले'},
+  {id:4,name:'Vijay Rao',city:'Hyderabad, TS',txt:'రైతు వికాస్ పత్ర స్కీమ్ గురించి ఎవరైనా చెప్పగలరా?',tag:'योजनाएं',color:'#1565C0',likes:6,time:'2 दिन पहले'},
+  {id:5,name:'महेंद्र पटेल',city:'सूरत, GJ',txt:'Tractor किराये पर available है — ₹500/घंटा। इच्छुक किसान संपर्क करें।',tag:'संसाधन',color:'#E65100',likes:4,time:'2 दिन पहले'},
+];
+
+/* ══════════════════════════════
+   TAB NAVIGATION
+══════════════════════════════ */
+function goTab(id, el) {
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('on'));
+  document.getElementById('scr-' + id).classList.add('on');
+  el.classList.add('on');
+  if (id === 'schemes') renderSchemes();
+  if (id === 'market')  renderMarket();
+  if (id === 'community') renderPosts();
+}
+
+/* ══════════════════════════════
+   VOICE
+══════════════════════════════ */
+function setLang(code, el) {
+  lang = code;
+  document.querySelectorAll('#langBar .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function toggleMic() {
+  if (isListening) stopListening(); else startListening();
+}
+
+function startListening() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SR) {
+    recognition = new SR();
+    const lmap = {hi:'hi-IN',mr:'mr-IN',ta:'ta-IN',te:'te-IN',bn:'bn-IN',en:'en-IN'};
+    recognition.lang = lmap[lang] || 'hi-IN';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onresult = e => { stopListening(); ask(e.results[0][0].transcript); };
+    recognition.onerror = () => { stopListening(); demoAsk(); };
+    recognition.onend = () => { if (isListening) stopListening(); };
+    try { recognition.start(); } catch(e) { demoAsk(); return; }
+  } else {
+    demoAsk(); return;
+  }
+  isListening = true;
+  document.getElementById('micBtn').classList.add('on');
+  document.getElementById('micBtn').textContent = '⏹';
+  document.getElementById('ring1').classList.add('go');
+  document.getElementById('ring2').classList.add('go');
+  document.getElementById('micLabel').textContent = '🔴 सुन रहा हूँ... बोलें';
+}
+
+function stopListening() {
+  isListening = false;
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+  document.getElementById('micBtn').classList.remove('on');
+  document.getElementById('micBtn').textContent = '🎤';
+  document.getElementById('ring1').classList.remove('go');
+  document.getElementById('ring2').classList.remove('go');
+  document.getElementById('micLabel').textContent = 'बोलने के लिए दबाएं';
+}
+
+function demoAsk() {
+  const demos = {hi:'गेहूं में खाद की सिफारिश बताएं',mr:'गहू पिकाची माहिती द्या',ta:'கோதுமைக்கு உரம் எப்படி?',te:'గోధుమ ఎరువు గురించి చెప్పండి',en:'What fertilizer for wheat crop?'};
+  ask(demos[lang] || demos.hi);
+}
+
+async function ask(query) {
+  addMessage(query, 'me');
+  const tid = addTyping();
+  let answer = '', offline = false;
+
+  if (navigator.onLine && API_URL && !API_URL.includes('YOUR_LAMBDA')) {
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({query, language: lang}),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (res.ok) { const d = await res.json(); answer = d.answer || d.response; }
+      else throw new Error();
+    } catch(e) { answer = getKB(query); offline = true; }
+  } else {
+    await new Promise(r => setTimeout(r, 900 + Math.random() * 600));
+    answer = getKB(query);
+    offline = !navigator.onLine;
+  }
+
+  removeTyping(tid);
+  addMessage(answer, 'ai', offline);
+  speakText(answer.substring(0, 250));
+}
+
+function addMessage(text, role, offline = false) {
+  const win = document.getElementById('chatWin');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap' + (role === 'me' ? ' me' : '');
+
+  if (role === 'ai') {
+    const av = document.createElement('div');
+    av.className = 'av av-ai'; av.textContent = '🌿';
+    wrap.appendChild(av);
+  }
+
+  const bub = document.createElement('div');
+  bub.className = 'bubble ' + role;
+  bub.style.whiteSpace = 'pre-line';
+  bub.textContent = text;
+
+  if (offline && role === 'ai') {
+    const src = document.createElement('div');
+    src.className = 'bubble-src';
+    src.textContent = '📵 Offline · Local Knowledge Base';
+    bub.appendChild(src);
+  }
+  wrap.appendChild(bub);
+  win.appendChild(wrap);
+  win.scrollTop = win.scrollHeight;
+}
+
+let typingCounter = 0;
+function addTyping() {
+  const id = 'typing-' + (++typingCounter);
+  const win = document.getElementById('chatWin');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap'; wrap.id = id;
+  const av = document.createElement('div');
+  av.className = 'av av-ai'; av.textContent = '🌿';
+  const t = document.createElement('div');
+  t.className = 'typing-ind';
+  t.innerHTML = '<div class="td"></div><div class="td"></div><div class="td"></div>';
+  wrap.appendChild(av); wrap.appendChild(t);
+  win.appendChild(wrap); win.scrollTop = win.scrollHeight;
+  return id;
+}
+function removeTyping(id) { const el = document.getElementById(id); if (el) el.remove(); }
+
+function speakText(text) {
+  if (!window.speechSynthesis || !text) return;
+  window.speechSynthesis.cancel();
+  const lmap = {hi:'hi-IN',mr:'mr-IN',ta:'ta-IN',te:'te-IN',bn:'bn-IN',en:'en-IN'};
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lmap[lang] || 'hi-IN'; u.rate = 0.85; u.pitch = 1.0;
+  window.speechSynthesis.speak(u);
+}
+
+/* ══════════════════════════════
+   CROP DISEASE
+══════════════════════════════ */
+function handleLeaf(inp) {
+  if (!inp.files[0]) return;
+  const r = new FileReader();
+  r.onload = e => {
+    const z = document.getElementById('uploadZone');
+    let img = z.querySelector('img');
+    if (!img) { img = document.createElement('img'); z.appendChild(img); }
+    img.src = e.target.result;
+    document.getElementById('uploadPrompt').style.display = 'none';
+    runAnalysis();
+  };
+  r.readAsDataURL(inp.files[0]);
+}
+
+function runDemo() {
+  document.getElementById('uploadPrompt').innerHTML =
+    '<div style="font-size:38px">🌾</div><div style="font-size:13px;font-weight:700;color:var(--leaf)">Demo leaf image loaded ✓</div>';
+  runAnalysis();
+}
+
+function runAnalysis() {
+  const ov = document.getElementById('scanOverlay');
+  ov.style.display = 'flex';
+  // Reset fill animation
+  const fill = document.getElementById('scanFill');
+  fill.style.animation = 'none';
+  fill.offsetHeight; // reflow
+  fill.style.animation = '';
+  document.getElementById('resultCard').classList.remove('show');
+
+  const keys = Object.keys(DISEASES);
+  const pick = keys[Math.floor(Math.random() * keys.length)];
+  const conf = (0.79 + Math.random() * 0.17).toFixed(2);
+
+  setTimeout(() => {
+    ov.style.display = 'none';
+    showDiseaseResult(pick, conf);
+  }, 2200 + Math.random() * 600);
+}
+
+function showDiseaseResult(key, conf) {
+  const d = DISEASES[key]; lastDisease = d;
+  const badgeMap = {danger:'badge badge-danger',warn:'badge badge-warn',ok:'badge badge-ok'};
+  const sevMap   = {danger:'⚠️ HIGH RISK',warn:'⚡ MEDIUM',ok:'✅ HEALTHY'};
+
+  document.getElementById('rName').textContent = d.name;
+  document.getElementById('rBadge').className  = badgeMap[d.sev];
+  document.getElementById('rBadge').textContent = sevMap[d.sev] + ' · ' + Math.round(conf * 100) + '%';
+  document.getElementById('rSym').textContent   = d.sym;
+  document.getElementById('rTreat').textContent = d.treat;
+  document.getElementById('rPrev').textContent  = d.prev;
+
+  const borderMap = {danger:'#EF9A9A',warn:'#FFCC80',ok:'#A5D6A7'};
+  const rc = document.getElementById('resultCard');
+  rc.style.borderColor = borderMap[d.sev];
+  rc.classList.add('show');
+}
+
+function speakResult() { if (lastDisease) speakText(lastDisease.speak); }
+
+/* ══════════════════════════════
+   SCHEMES
+══════════════════════════════ */
+function setCat(c, el) {
+  cat = c;
+  document.querySelectorAll('#catChips .chip').forEach(x => x.classList.remove('on'));
+  el.classList.add('on');
+  renderSchemes();
+}
+
+function renderSchemes() {
+  const q = (document.getElementById('schSearch').value || '').toLowerCase();
+  const list = document.getElementById('schList');
+  list.innerHTML = '';
+  const filtered = SCHEMES.filter(s =>
+    (cat === 'all' || s.cat === cat) &&
+    (!q || s.name.toLowerCase().includes(q) || s.hi.includes(q) || s.benefit.toLowerCase().includes(q))
+  );
+  filtered.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'scheme-card';
+    el.innerHTML = `
+      <div class="scheme-top" onclick="toggleScheme(this)">
+        <div class="sch-ico" style="background:${s.bg}">${s.icon}</div>
+        <div class="sch-info">
+          <div class="sch-name">${s.hi}</div>
+          <div class="sch-benefit">${s.benefit}</div>
+        </div>
+        <div class="sch-chevron">›</div>
+      </div>
+      <div class="scheme-body">
+        <div class="info-row"><div class="info-label">✅ पात्रता</div><div class="info-val">${s.elig}</div></div>
+        <div class="info-row"><div class="info-label">📄 दस्तावेज़</div><div class="info-val">${s.docs}</div></div>
+        <div class="info-row"><div class="info-label">📝 आवेदन</div><div class="info-val">${s.apply}</div></div>
+        <div class="helpline-box">
+          <span style="font-size:22px">📞</span>
+          <div><div class="hl-lbl">Helpline (मुफ्त)</div><div class="hl-num">${s.helpline}</div></div>
+        </div>
+        <div class="sch-speak" onclick="speakText('${s.speak}')">🔊 हिंदी में सुनें</div>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+function toggleScheme(hdr) {
+  const body = hdr.closest('.scheme-card').querySelector('.scheme-body');
+  const chev = hdr.querySelector('.sch-chevron');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+/* ══════════════════════════════
+   MARKET
+══════════════════════════════ */
+function renderMarket() {
+  renderPriceList('priceList1', MANDI1);
+  renderPriceList('priceList2', MANDI2);
+  document.getElementById('mspList').innerHTML = MSP_DATA.map(m => `
+    <div class="msp-row">
+      <span class="msp-crop">${m.ico} ${m.n}</span>
+      <span class="msp-price">${m.p}</span>
+    </div>`).join('');
+}
+
+function renderPriceList(id, data) {
+  document.getElementById(id).innerHTML = data.map(p => `
+    <div class="price-row">
+      <div class="crop-ico">${p.ico}</div>
+      <div class="crop-detail">
+        <div class="crop-name">${p.n}</div>
+        <div class="crop-hi">${p.h}</div>
+      </div>
+      <div class="price-right">
+        <div class="price-val">₹${p.p}</div>
+        <div class="price-chg ${p.up ? 'up' : 'dn'}">${p.up ? '▲' : '▼'} ${p.up ? '+' : ''}₹${Math.abs(p.c)}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════
+   COMMUNITY
+══════════════════════════════ */
+function pickTag(el, t) {
+  selTag = t;
+  document.querySelectorAll('.tag-opt').forEach(x => x.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function submitPost() {
+  const txt = document.getElementById('composeTxt').value.trim();
+  if (!txt) { showToast('कुछ लिखें पहले!'); return; }
+  const colors = ['#2E7D32','#1565C0','#6A1B9A','#E65100','#B71C1C'];
+  posts.unshift({
+    id: Date.now(), name: 'आप', city: 'यह डिवाइस', txt,
+    tag: selTag, color: colors[Math.floor(Math.random() * colors.length)],
+    likes: 0, time: 'अभी'
+  });
+  document.getElementById('composeTxt').value = '';
+  renderPosts();
+  showToast('✅ Post हो गई!');
+}
+
+function renderPosts() {
+  document.getElementById('postCount').textContent = posts.length;
+  document.getElementById('postFeed').innerHTML = posts.map(p => `
+    <div class="post-card">
+      <div class="post-top">
+        <div class="post-av" style="background:${p.color}">${[...p.name][0]}</div>
+        <div>
+          <div class="post-name">${p.name}</div>
+          <div class="post-meta">${p.city} · ${p.time}</div>
+        </div>
+        <div class="post-tag" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}66">${p.tag}</div>
+      </div>
+      <div class="post-txt">${p.txt}</div>
+      <div class="post-actions">
+        <button class="pact" onclick="likeP(${p.id},this)">❤️ ${p.likes}</button>
+        <button class="pact">💬 Reply</button>
+        <button class="pact">↗ Share</button>
+      </div>
+    </div>`).join('');
+}
+
+function likeP(id, btn) {
+  const p = posts.find(x => x.id === id);
+  if (p) { p.likes++; btn.textContent = '❤️ ' + p.likes; }
+}
+
+/* ══════════════════════════════
+   NETWORK STATUS
+══════════════════════════════ */
+function updateNet() {
+  const badge = document.getElementById('netBadge');
+  const dot   = document.getElementById('netDot');
+  const txt   = document.getElementById('netTxt');
+  if (navigator.onLine) {
+    badge.style.background = 'rgba(255,255,255,.18)';
+    badge.style.borderColor = 'rgba(255,255,255,.3)';
+    badge.style.color = '#fff';
+    dot.style.background = '#4CD964';
+    txt.textContent = 'Online';
+  } else {
+    badge.style.background = 'rgba(255,200,50,.18)';
+    badge.style.borderColor = 'rgba(255,200,50,.5)';
+    badge.style.color = '#FFE082';
+    dot.style.background = '#FFD740';
+    txt.textContent = '📵 Offline Mode';
+  }
+}
+window.addEventListener('online', updateNet);
+window.addEventListener('offline', updateNet);
+updateNet();
+
+/* ══════════════════════════════
+   TOAST
+══════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('vis');
+  setTimeout(() => t.classList.remove('vis'), 2600);
+}
+
+/* ── INIT ── */
+renderSchemes();
+renderMarket();
+renderPosts();
+</script>
+</body>
+</html>
